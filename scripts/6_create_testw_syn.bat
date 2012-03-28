@@ -1,0 +1,1 @@
+sqlplus /nolog @_6_create_testw_syn.sql %1

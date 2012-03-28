@@ -1,0 +1,82 @@
+--
+-- 1
+--
+-- Export full DB
+exp userid=compas_isbx002/isbx002@compas file=compas_isbx002_20120214.dmp full=y log=compas_isbx002_20120214.log
+
+--
+-- 2
+--
+sqlplus
+system as sysdba
+-- then password (should be compas)
+
+CREATE USER testq_isbx002 IDENTIFIED BY testq_isbx002 DEFAULT TABLESPACE CTS2_DATA TEMPORARY TABLESPACE TEMPORARY_DATA;
+GRANT CONNECT ,RESOURCE ,DBA TO testq_isbx002;
+grant compaS_all, ADM to testq_isbx002 WITH ADMIN OPTION;
+GRANT SELECT ON V_$SESSION TO testq_isbx002;
+@CO_ROLE
+exit
+
+--
+-- 3
+--
+imp fromuser=COMPAS_isbx002 touser=testq_isbx002 file=compas_isbx002_20120213.dmp log=compas_isbx002_20120213.imp.log
+user=system
+pass=compas
+
+--
+-- 4
+--
+Fix.bat
+
+--
+-- 5
+--
+conn testq_isbx002/testq_isbx002
+
+drop trigger t_lgnon_mod;
+drop trigger t_lognoff_mod;
+
+
+@ewaybill_objs
+@epic_lti
+@write_waybill
+
+col object_name format a30
+col object_type format a30
+select object_name, object_type from user_objects where status='INVALID';
+
+-- not needed if we are re-creating
+create role epic_viewonly;
+create role epic_all;
+
+@GrantAlltoEpic.sql
+@GrantSelectToEpic_viewonly.sql
+
+CREATE USER testw_isbx002 IDENTIFIED BY testw_isbx002 DEFAULT TABLESPACE CTS2_DATA TEMPORARY TABLESPACE TEMPORARY_DATA;
+grant create session, create synonym, epic_viewonly, epic_all to testw_isbx002;
+alter user testw_isbx002 default role epic_viewonly;
+
+
+--
+-- 6
+--
+set scan on
+conn testw_isbx002/testw_isbx002
+-- the  parameter value is  "testq_isbx002." (don't forget the DOT ".")
+@synonymforEpic
+
+col SYNONYM_NAME format a30
+col TABLE_OWNER format a30
+select SYNONYM_NAME, TABLE_OWNER from user_synonyms where synonym_name like 'EPIC_%';
+
+desc EPIC_GEO
+desc EPIC_LOSSDAMAGEREASON
+desc EPIC_LTI
+desc EPIC_PERSONS
+desc EPIC_STOCK
+desc write_waybill
+
+Set role epic_all identified by writeon;
+

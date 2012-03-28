@@ -1,0 +1,1 @@
+sqlplus /nolog @_2_create_testq.sql %1
