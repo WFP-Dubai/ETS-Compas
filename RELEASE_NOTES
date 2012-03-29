@@ -1,0 +1,12 @@
+1.1.0
+Description: several enhancements
+Release Date: 30-Mar-2012
+- write_waybill.dispatch now has an additional parameter "p_trailer_plate in varchar2 default null" placed after p_vehiclereg
+- write_waybill.dispatch and write_waybill.receipt now validate incoming transaction type
+- view epic_geo now have an additional field compas_indicator after organization_id
+
+1.0.0
+Description: arbitrary initial release
+Release Date: 01-Mar-2012
+- stable software
+- serialized scripted install procedure 
