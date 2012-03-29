@@ -1,3 +1,7 @@
+prompt
+prompt Creating package WRITE_WAYBILL
+prompt ==============================
+prompt
 create or replace package write_waybill is
 
    -- Author  : MARCO.VITTORINI
@@ -96,6 +100,11 @@ create or replace package write_waybill is
 
 end write_waybill;
 /
+
+prompt
+prompt Creating package body WRITE_WAYBILL
+prompt ==============================
+prompt
 create or replace package body write_waybill is
 
    -- v_format_date

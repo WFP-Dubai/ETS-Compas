@@ -4,9 +4,12 @@ conn testq_&&1/testq_&&1
 drop trigger t_lgnon_mod;
 drop trigger t_lognoff_mod;
 
+set scan off
 @ewaybill_objs
 @epic_lti
 @write_waybill
+@epic_geo
+set scan on
 
 -- not needed if we are re-creating
 create role epic_viewonly;

@@ -1,3 +1,7 @@
+prompt
+prompt Creating view EPIC_GEO
+prompt ======================
+prompt
 create or replace view epic_geo as
 select org_units.code as org_code,
        org_units.name,
