@@ -1,5 +1,11 @@
 CREATE OR REPLACE VIEW EPIC_GEO AS
-SELECT 
-	org_units.CODE as ORG_CODE, org_units.NAME, org_units.GEO_POINT_CODE,GEO_POINTS.NAME as GEO_NAME,COUNTRY_CODE,REPORTING_CODE,ORGANIZATION_ID
-FROM org_units, GEO_POINTS
-where GEO_POINT_CODE = GEO_POINTS.CODE;
+select org_units.code as org_code,
+       org_units.name,
+       org_units.geo_point_code,
+       geo_points.name as geo_name,
+       country_code,
+       reporting_code,
+       organization_id
+from org_units,
+     geo_points
+where geo_point_code = geo_points.code;
