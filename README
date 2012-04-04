@@ -1,1 +1,19 @@
 ETS Compas is the compas related part of ETS
+
+Download the required software to the destination server. Latest software can be found on GitHub at the following URL: https://github.com/WFP-Dubai/ETS-Compas
+
+Connect locally to the destination server with a remote connection tool (i.e. TeamViewer).
+
+Open a command prompt window and change the current directory to SCRIPTS folder inside ETS-Compas.
+
+Enter the following command replacing XXXXNNN and YYYYMMDD with needed Compas station code and timestamp and press ENTER:
+
+0_install XXXXNNN YYYYMMDD
+
+I.e.: 
+
+0_install KARX001 20120301
+
+Press any key when prompted after having taken notes of any error. Press CTRL-C if there is any blocking error.
+
+The procedure ends leaving the user inside SQLPLUS connected with user TESTW_XXXXNNN
