@@ -1,1 +1,1 @@
-sqlplus /nolog @_5_create_testq_newobjs.sql %1
+sqlplus /nolog @_5_create_testq_newobjs.sql %1 %2

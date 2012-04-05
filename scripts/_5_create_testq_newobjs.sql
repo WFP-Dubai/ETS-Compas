@@ -7,8 +7,11 @@ drop trigger T_LGNON_MOD;
 prompt dropping trigger T_LOGNOFF_MOD
 drop trigger T_LOGNOFF_MOD;
 
-set scan off
+prompt creating package ets_compas with version number &&2
 @ets_compas
+
+prompt creating views and package WRITE_WAYBILL
+set scan off
 @ewaybill_objs
 @epic_lti
 @write_waybill
