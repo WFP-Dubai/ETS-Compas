@@ -1,7 +1,6 @@
 prompt
 prompt Creating package WRITE_WAYBILL
 prompt ==============================
-prompt
 create or replace package write_waybill is
 
    -- Author  : MARCO.VITTORINI

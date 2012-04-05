@@ -8,7 +8,6 @@ spool ewaybill_objs.log
 prompt
 prompt Creating view EPIC_LOSSDAMAGEREASON
 prompt ===================================
-prompt
 create or replace view epic_lossdamagereason as
 select distinct b.type,
                      comm_category_code,
@@ -20,7 +19,6 @@ select distinct b.type,
 prompt
 prompt Creating view EPIC_PERSONS
 prompt ==========================
-prompt
 CREATE OR REPLACE VIEW EPIC_PERSONS AS
 SELECT org_unit_code||code PERSON_PK, org_unit_code, code, type_of_document, organization_id,
        last_name, first_name, title, document_number, e_mail_address,
@@ -32,7 +30,6 @@ SELECT org_unit_code||code PERSON_PK, org_unit_code, code, type_of_document, org
 prompt
 prompt Creating view EPIC_STOCK
 prompt ========================
-prompt
 create or replace view epic_stock
 (wh_pk, wh_regional, wh_country, wh_location, wh_code, wh_name, project_wbs_element, si_record_id, si_code, origin_id, reference_number, comm_category_code, commodity_code, cmmname, package_code, packagename, qualitycode, qualitydescr, quantity_net, quantity_gross, number_of_units, allocation_code)
 as

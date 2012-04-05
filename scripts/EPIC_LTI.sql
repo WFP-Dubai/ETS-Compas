@@ -1,7 +1,6 @@
 prompt
 prompt Creating view EPIC_LTI
 prompt ======================
-prompt
 CREATE OR REPLACE VIEW EPIC_LTI
 (lti_pk, lti_id, code, lti_date, expiry_date, transport_code, transport_ouc, transport_name, origin_type, origintype_desc, origin_location_code, origin_loc_name, origin_wh_code, origin_wh_name, destination_location_code, destination_loc_name, consegnee_code, consegnee_name, requested_dispatch_date, project_wbs_element, si_record_id, si_code, comm_category_code, commodity_code, cmmname, quantity_net, quantity_gross, number_of_units, unit_weight_net, unit_weight_gross, remarks, remarks_b)
 AS

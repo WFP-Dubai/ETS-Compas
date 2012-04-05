@@ -10,7 +10,7 @@ SET HEADING OFF
 SET LONG 2000
 SET VER OFF
 
-
+prompt creating trigger T_ORGU_MOD
 CREATE OR REPLACE TRIGGER T_ORGU_MOD
  BEFORE
  INSERT OR UPDATE
@@ -79,7 +79,8 @@ END;
 
 commit;
 
-CREATE OR REPLACE TRIGGER t_statsddl_del
+prompt creating trigger T_STATSDDL_DEL
+CREATE OR REPLACE TRIGGER T_STATSDDL_DEL
 AFTER  DELETE 
 ON statsddl
 REFERENCING NEW AS NEW OLD AS OLD
@@ -106,6 +107,7 @@ commit;
 --------------------
 --create Objects.sql
 --------------------
+prompt creating script to compile invalid objects
 SPOOL Objects.sql
 
 select 'ALTER '|| DECODE(object_type,'PACKAGE BODY','PACKAGE',object_type) || ' '|| OBJECT_NAME|| ' compile ;' 
@@ -136,6 +138,8 @@ SET HEADING ON
 SET LONG 2000
 SET VER oN
 
+
+prompt displaying invalid objects
 show user
  
 select * from USER_OBJECTS WHERE STATUS NOT LIKE 'VALID'
@@ -144,8 +148,10 @@ select * from USER_OBJECTS WHERE STATUS NOT LIKE 'VALID'
 select * from USER_TRIGGERS WHERE STATUS LIKE 'DIS%'
 /
 
+prompt compiling invalid objects
 start objects.sql
 
+prompt displaying invalid objects again... should be NONE!
 SELECT * FROM USER_ERRORS
 /
 

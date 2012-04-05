@@ -1,4 +1,7 @@
 SPOOL COMPASV2GRANT_VIEWONLY.LOG
+
+prompt granting select privilege on all objects to role EPIC_VIEWONLY (could take a while)
+
 grant select   on ACTUAL_BENEFICIARIES to epic_viewonly;           
 grant select   on ALLOC_AREAS to epic_viewonly;           
 grant select   on BASE_LABELS to epic_viewonly;                    

@@ -1,22 +1,29 @@
--- sqlplus /nolog @2_create_testq.sql karx001
--- conn system as sysdba
+prompt Connecting as sys
 conn sys/compas as sysdba
 
--- shutdown immediate
+prompt shutting down (transactional)
 shutdown transactional
+
+prompt startup
 startup
 
+prompt dropping TESTW_
 drop user testw_&&1 cascade;
+
+prompt dropping TESTQ_
 drop user testq_&&1 cascade;
 
+prompt creating TESTQ_
 WHENEVER SQLERROR EXIT SQL.SQLCODE
 CREATE USER testq_&&1 IDENTIFIED BY testq_&&1 DEFAULT TABLESPACE CTS2_DATA TEMPORARY TABLESPACE TEMPORARY_DATA;
 
+prompt granting TESTQ_
 WHENEVER SQLERROR CONTINUE
 GRANT CONNECT, RESOURCE, DBA TO testq_&&1;
 grant compaS_all, ADM to testq_&&1 WITH ADMIN OPTION;
 GRANT SELECT ON V_$SESSION TO testq_&&1;
 
+prompt granting TESTQ_ with a lot of privileges... this could take a while
 set termout off
 grant A101E to testq_&&1;
 grant A101V to testq_&&1;
@@ -78,6 +85,8 @@ grant A704 to testq_&&1;
 grant A705 to testq_&&1;
 grant A706 to testq_&&1;
 set termout on
+
+prompt Done!
 
 exit
 

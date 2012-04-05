@@ -1,10 +1,9 @@
 prompt
 prompt Creating package ETS_COMPAS
 prompt ==============================
-prompt
 create or replace package ets_compas is
 
-   VERSION constant varchar2(100) := '1.2.0.b1';
+   VERSION constant varchar2(100) := '1.2.0.b2';
    
    function get_version return varchar2;
 

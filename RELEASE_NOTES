@@ -2,6 +2,7 @@
 Description: exposiong version number
 Release Date: 05-Mar-2012
 - added package ets_compas. now it's possible to call function ets_compas.get_version to get current version number
+- enhanced commenting
 
 1.1.0
 Description: several enhancements

@@ -1,5 +1,7 @@
+prompt connecting as sys
 sys/COMPAS as sysdba
 
+prompt granting select on sessions
 set termout on
 SET SQLCASE  UPPER
 SET ECHO ON

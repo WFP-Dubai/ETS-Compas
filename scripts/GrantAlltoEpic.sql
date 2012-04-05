@@ -1,4 +1,7 @@
 SPOOL COMPASV2GRANT.LOG
+
+prompt granting all privileges on all objects to role EPIC_ALL (could take a while)
+
 grant all   on ACTUAL_BENEFICIARIES to epic_all;           
 grant all   on ALLOC_AREAS to epic_all;           
 grant all   on BASE_LABELS to epic_all;                    
