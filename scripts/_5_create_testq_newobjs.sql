@@ -22,6 +22,7 @@ create role EPIC_VIEWONLY;
 prompt creating role EPIC_ALL (errors are ok if we are refreshing)
 create role EPIC_ALL;
 
+prompt granting to EPIC_ALL and EPIC_VIEWONLY
 set termout off
 @GrantAlltoEpic.sql
 @GrantSelectToEpic_viewonly.sql
