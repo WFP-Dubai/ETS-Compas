@@ -5,6 +5,7 @@ drop trigger t_lgnon_mod;
 drop trigger t_lognoff_mod;
 
 set scan off
+@ets_compas
 @ewaybill_objs
 @epic_lti
 @write_waybill
