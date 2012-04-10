@@ -99,7 +99,6 @@ create or replace package write_waybill is
 
 end write_waybill;
 /
-
 prompt
 prompt Creating package body WRITE_WAYBILL
 prompt ==============================
@@ -1591,7 +1590,7 @@ create or replace package body write_waybill is
           dspmst_rec.driver_name, -- driver_name -- VARCHAR2(50)  Y
           dspmst_rec.license, -- license -- VARCHAR2(20)  Y
           dspmst_rec.vehicle_registration, -- vehicle_registration -- VARCHAR2(20) Y
-          dspmst_rec.vehicle_registration, -- trailer_plate -- VARCHAR2(20)  Y
+          dspmst_rec.trailer_plate, -- trailer_plate -- VARCHAR2(20)  Y
           dspmst_rec.container_number, -- container_number -- VARCHAR2(15) Y
           dspmst_rec.atl_li_code, -- atl_li_code -- VARCHAR2(8) Y
           dspmst_rec.notify_indicator, -- notify_indicator -- VARCHAR2(1)  Y
