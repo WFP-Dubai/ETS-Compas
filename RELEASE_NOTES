@@ -1,3 +1,8 @@
+1.3.0
+Description: code-only update installation procedure
+Release Date: 10-Mar-2012
+- added the possibility to start the installation procedure starting from an input step number
+
 1.2.0
 Description: exposiong version number
 Release Date: 05-Mar-2012
