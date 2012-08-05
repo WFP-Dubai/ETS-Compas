@@ -8,8 +8,14 @@ create or replace package write_waybill is
    -- Purpose : 
 
    -- Author  : DANIELA.TALONE
-   -- Modified : 25/10/2010
+   -- Modified: 25/10/2010
    -- Purpose : 
+
+   -- Author  : LUCIANO.ORLANDI
+   -- Modified: 01/08/2012
+   -- Purpose : CR - additional parameters for RECEIPT net and gross weights (good, damage and loss quantities)
+   --						CR - additional parameters for RECEIPT of diverted delivery (location and warehouse)
+
 
    dspmst_rec dispatch_masters%rowtype;
    dspdtl_rec dispatch_details%rowtype;
@@ -88,7 +94,15 @@ create or replace package write_waybill is
       p_cmmcode in varchar2 default null,
       p_pckcode in varchar2 default null,
       p_alloccode in varchar2 default null,
-      p_quality in varchar2 default null
+      p_quality in varchar2 default null,      
+      p_good_net in varchar2 default null,   --> new parameter for received net qty
+			p_good_gross in varchar2 default null, --> new parameter for received gross qty
+      p_damage_net in varchar2 default null,   --> new parameter for received damage net qty
+      p_damage_gross in varchar2 default null, --> new parameter for received damage gross qty
+      p_loss_net in varchar2 default null,   --> new parameter for received loss net qty
+      p_loss_gross in varchar2 default null, --> new parameter for received loss gross qty
+      p_receiving_location in varchar2 default null, -->	new parameter for diverted delivery
+      p_receiving_wh in varchar2 default null --> new parameter for diverted delivery      
    );
 
    function validatedispacth return varchar2;
@@ -588,7 +602,15 @@ create or replace package body write_waybill is
       p_cmmcode in varchar2 default null,
       p_pckcode in varchar2 default null,
       p_alloccode in varchar2 default null,
-      p_quality in varchar2 default null
+      p_quality in varchar2 default null,    
+      p_good_net in varchar2 default null,   --> new parameter for received net qty
+      p_good_gross in varchar2 default null, --> new parameter for received gross qty
+      p_damage_net in varchar2 default null,   --> new parameter for received damage net qty
+      p_damage_gross in varchar2 default null, --> new parameter for received damage gross qty
+      p_loss_net in varchar2 default null,   --> new parameter for received loss net qty
+      p_loss_gross in varchar2 default null, --> new parameter for received loss gross qty   
+      p_receiving_location in varchar2 default null, -->	new parameter for diverted delivery
+      p_receiving_wh in varchar2 default null --> new parameter for diverted delivery
    ) is
    
       r_receipt_masters receipt_masters%rowtype;
@@ -601,19 +623,22 @@ create or replace package body write_waybill is
       r_trans_losses trans_losses%rowtype;
       v_loss_code loss_damage_causes.name_record_id%type;
       v_loss_cause_id loss_damage_causes.record_id%type;
+      -- actual values for received, damage and loss quantities      
+   		v_quantity_net receipt_details.quantity_net%type;
+   		v_quantity_gross receipt_details.quantity_gross%type;   		
    
+      p_units number;
       p_net number;
       p_gross number;
-      p_units number;
    
    begin
    
       p_return_message := null;
       p_return_flag := null;
    
+      p_units := null;
       p_net := null;
       p_gross := null;
-      p_units := null;
    
       /*
       CODE  JERX001100B99911P
@@ -624,6 +649,15 @@ create or replace package body write_waybill is
       r_receipt_masters.code := compas_lib.get_current_site || p_wbcode || 'P';
       -- compas_lib.get_current_site || lpad(p_wbcode, 9, '0') || 'P';
       r_receipt_masters.org_unit_code := compas_lib.get_current_site;
+      
+      -- 30/07/2012 additional parameters for diverted delivery
+      if (p_receiving_location is null or p_receiving_wh is null) then            
+	      r_receipt_masters.receipt_location_code := r_dispatch_masters.destination_location_code;
+	      r_receipt_masters.receipt_code := r_dispatch_masters.destination_code;
+      else
+	      r_receipt_masters.receipt_location_code := p_receiving_location;
+	      r_receipt_masters.receipt_code := p_receiving_wh;      
+      end if;           
    
       begin
          select *
@@ -843,8 +877,8 @@ create or replace package body write_waybill is
              r_receipt_masters.document_code, -- DOCUMENT_CODE, --  VARCHAR2(2) 
              r_receipt_masters.org_unit_code, -- ORG_UNIT_CODE, --  VARCHAR2(13)  
              null, -- EXTRA_CODE, -- VARCHAR2(25)  Y
-             r_dispatch_masters.destination_location_code, -- RECEIPT_LOCATION_CODE, --  VARCHAR2(10)  
-             r_dispatch_masters.destination_code, -- RECEIPT_CODE, -- VARCHAR2(13)  
+             r_receipt_masters.receipt_location_code, -- RECEIPT_LOCATION_CODE, --  VARCHAR2(10)  
+             r_receipt_masters.receipt_code, -- RECEIPT_CODE, -- VARCHAR2(13)  
              p_person_ouc, -- PERSON_OUC_REC, -- VARCHAR2(13)  
              p_person_code, -- PERSON_CODE_REC, --  VARCHAR2(7) 
              r_dispatch_masters.tran_type_code, -- TRAN_TYPE_CODE_REC, -- VARCHAR2(4) 
@@ -900,8 +934,8 @@ create or replace package body write_waybill is
             set code = r_receipt_masters.code, --    VARCHAR2(25)  
                 document_code = r_receipt_masters.document_code, --     VARCHAR2(2) 
                 org_unit_code = r_receipt_masters.org_unit_code, --     VARCHAR2(13)  
-                receipt_location_code = r_dispatch_masters.destination_location_code, --    VARCHAR2(10)  
-                receipt_code = r_dispatch_masters.destination_code, --   VARCHAR2(13)  
+                receipt_location_code = r_receipt_masters.receipt_location_code, --    VARCHAR2(10)  
+                receipt_code = r_receipt_masters.receipt_code, --   VARCHAR2(13)  
                 person_ouc_rec = p_person_ouc, --    VARCHAR2(13)  
                 person_code_rec = p_person_code, --     VARCHAR2(7) 
                 tran_type_code_rec = r_dispatch_masters.tran_type_code, --   VARCHAR2(4) 
@@ -941,20 +975,29 @@ create or replace package body write_waybill is
                   org_unit_code = r_receipt_masters.org_unit_code;
       end;
    
-      if p_goodunits is not null then
-         --> bulk cargo
-         if p_pckcode in ('BK01', 'BKBE', 'BKBG', 'BKBO', 'BKBT', 'BULK') then
-            p_net := r_dispatch_details.quantity_net -
+      -- Feature #381 - additional parameters for received net qty and received gross qty
+      if (p_good_net is null or p_good_gross is null) then
+	      if p_goodunits is not null then      
+        	--> bulk cargo
+        	if p_pckcode in ('BK01', 'BKBE', 'BKBG', 'BKBO', 'BKBT', 'BULK') then
+						p_net := r_dispatch_details.quantity_net -
                      nvl(p_damageunits, 0) - nvl(p_lossunits, 0);
          
             p_gross := r_dispatch_details.quantity_gross -
                        nvl(p_damageunits, 0) - nvl(p_lossunits, 0);
          
-         else
-            p_net := (p_goodunits * r_dispatch_details.unit_weight_net) / 1000;
+	        else
+						p_net := (p_goodunits * r_dispatch_details.unit_weight_net) / 1000;
             p_gross := (p_goodunits * r_dispatch_details.unit_weight_gross) / 1000;
          
-         end if;
+					end if;
+				end if;
+			else
+				p_net := p_good_net;
+				p_gross := p_good_gross;
+			end if;
+			
+      if (p_net is not null and p_gross is not null) then         
          /*RECEIPT_DETAILS*/
          begin
             insert into receipt_details
@@ -1039,18 +1082,30 @@ create or replace package body write_waybill is
          end;
       end if;
    
-      if p_damageunits is not null then
-         if p_pckcode in ('BK01', 'BKBE', 'BKBG', 'BKBO', 'BKBT', 'BULK') then
+      p_net := null;
+      p_gross := null;
+   
+      -- Feature #381 - additional parameters for received damage net qty and received damage gross qty
+      if (p_damage_net is null or p_damage_gross is null) then   
+	      if p_damageunits is not null then
+					if p_pckcode in ('BK01', 'BKBE', 'BKBG', 'BKBO', 'BKBT', 'BULK') then
             p_net := nvl(p_damageunits, 0);
             p_gross := nvl(p_damageunits, 0);
             p_units := 1;
-         else
+	        else
             p_net := (p_damageunits * r_dispatch_details.unit_weight_net) / 1000;
             p_gross := (p_damageunits *
                        r_dispatch_details.unit_weight_gross) / 1000;
             p_units := p_damageunits;
-         end if;
-      
+	        end if;
+        end if;
+			else
+				p_net := p_damage_net;
+				p_gross := p_damage_gross;   
+        p_units := p_damageunits;				
+			end if;
+         
+      if (p_net is not null and p_gross is not null) then                  
          /*TRANS_DAMAGES*/
          begin
             insert into trans_damages
@@ -1150,18 +1205,30 @@ create or replace package body write_waybill is
          end;
       end if;
    
-      if p_lossunits is not null then
-      
-         if p_pckcode in ('BK01', 'BKBE', 'BKBG', 'BKBO', 'BKBT', 'BULK') then
+      p_net := null;
+	    p_gross := null;
+
+      -- Feature #381 - additional parameters for received loss net qty and received loss gross qty
+      if (p_loss_net is null or p_loss_gross is null) then      
+	      if p_lossunits is not null then
+     
+					if p_pckcode in ('BK01', 'BKBE', 'BKBG', 'BKBO', 'BKBT', 'BULK') then
             p_net := nvl(p_lossunits, 0);
             p_gross := nvl(p_lossunits, 0);
             p_units := 1;
-         else
+	        else
             p_net := (p_lossunits * r_dispatch_details.unit_weight_net) / 1000;
             p_gross := (p_lossunits * r_dispatch_details.unit_weight_gross) / 1000;
             p_units := p_lossunits;
-         end if;
-      
+	        end if;
+        end if;
+			else
+				p_net := p_loss_net;
+				p_gross := p_loss_gross;   
+        p_units := p_lossunits;				
+      end if;         
+               
+			if (p_net is not null and p_gross is not null) then                                 
          /*TRANS_LOSSES*/
          begin
             insert into trans_losses
